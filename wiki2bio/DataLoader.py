@@ -7,7 +7,6 @@ import tensorflow as tf
 import time
 import numpy as np
 import nltk
-nltk.download('punkt')
 def summary_tokenize(s):
     return nltk.word_tokenize(s)
 

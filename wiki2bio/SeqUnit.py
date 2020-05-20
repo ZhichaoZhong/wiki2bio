@@ -254,7 +254,7 @@ class SeqUnit(object):
             o_t = self.dec_out(o_t, finished)
             emit_ta = emit_ta.write(t, o_t)
             att_ta = att_ta.write(t, w_t)
-            next_token = tf.arg_max(o_t, 1)
+            next_token = tf.math.argmax(o_t, 1)
             x_nt = tf.nn.embedding_lookup(self.embedding, next_token)
             finished = tf.logical_or(finished, tf.equal(next_token, self.stop_token))
             finished = tf.logical_or(finished, tf.greater_equal(t, self.max_length))
@@ -266,7 +266,7 @@ class SeqUnit(object):
             loop_vars=(time, x0, h0, emit_ta, att_ta, f0))
 
         outputs = tf.transpose(emit_ta.stack(), [1,0,2])
-        pred_tokens = tf.arg_max(outputs, 2)
+        pred_tokens = tf.math.argmax(outputs, 2)
         atts = att_ta.stack()
         return pred_tokens, atts
 
