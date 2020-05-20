@@ -6,7 +6,9 @@
 import tensorflow as tf
 import time
 import numpy as np
-
+import nltk
+def summary_tokenize(s):
+    return nltk.word_tokenize(s)
 
 class DataLoader(object):
     def __init__(self, data_dir, limits):
@@ -43,8 +45,8 @@ class DataLoader(object):
             fields = fields[:self.limits]
             poses = poses[:self.limits]
             rposes = rposes[:self.limits]
-        print summaries[0].strip().split(' ')
-        summaries = [list(map(int, summary.strip().split(' '))) for summary in summaries]
+        print(summaries[0].strip().split(' '))
+        summaries = [list(map(int, summary.strip().split(' '))) for summary in summaries if summary.split()]
         texts = [list(map(int, text.strip().split(' '))) for text in texts]
         fields = [list(map(int, field.strip().split(' '))) for field in fields]
         poses = [list(map(int, pos.strip().split(' '))) for pos in poses]

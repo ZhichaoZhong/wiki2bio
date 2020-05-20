@@ -5,10 +5,10 @@ import time, os, sys, shutil
 TOTAL_BAR_LENGTH = 100.
 last_time = time.time()
 begin_time = last_time
-print os.popen('stty size', 'r').read()
-_, term_width = os.popen('stty size', 'r').read().split()
-term_width = int(term_width)
-
+# print(os.popen('stty size', 'r').read())
+# _, term_width = os.popen('stty size', 'r').read().split()
+# term_width = int(term_width)
+term_width = 125
 
 def progress_bar(current, total, msg=None):
     global last_time, begin_time
@@ -96,4 +96,3 @@ def write_word(pred_list, save_dir, name):
     ss = open(save_dir + name, "w+")
     for item in pred_list:
         ss.write(" ".join(item) + '\n')
-            
