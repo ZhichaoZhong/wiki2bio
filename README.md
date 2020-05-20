@@ -5,6 +5,13 @@ This project provides the implementation of table-to-text (infobox-to-biography)
 
 Details of table-to-text generation can be found [here](https://tyliupku.github.io/papers/aaai2018_liu.pdf). The implementation is based on Tensorflow 1.0.0 and Python 2.7.
 
+## 2020-05-20
+This a fork of the original package. The purpose is to configure it for the databricks+s3 environment. 
+## ToDo
+1. [ ] Replace the ROUGE by pure python codes or simply remove it
+2. [ ] Make a setup.py file so that the package can be pip-installed
+3. [ ] Change the hard-coded paths to variables.
+
 # Model Overview
 <p align="center"><img width="85%" src="doc/frame.png"/></p>
 wiki2bio is a natural language generation task which transforms Wikipedia infoboxes to corresponding biographies.
