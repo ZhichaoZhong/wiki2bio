@@ -7,13 +7,13 @@ import sys
 import os
 import tensorflow as tf
 import time
-from SeqUnit import *
-from DataLoader import DataLoader
+from .SeqUnit import *
+from .DataLoader import DataLoader
 import numpy as np
-from PythonROUGE import PythonROUGE
+from .PythonROUGE import PythonROUGE
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
-from preprocess import *
-from util import * 
+from .preprocess import *
+from .util import *
 
 
 tf.app.flags.DEFINE_integer("hidden_size", 500, "Size of each layer.")
@@ -190,14 +190,14 @@ def evaluate(sess, dataloader, model, ksave_dir, mode='valid'):
     result = copy_result + nocopy_result 
     # print result
     if mode == 'valid':
-        print result
+        print(result)
 
     return result
 
 
 
 def write_log(s):
-    print s
+    print(s)
     with open(log_file, 'a') as f:
         f.write(s+'\n')
 

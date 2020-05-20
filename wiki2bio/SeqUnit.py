@@ -5,11 +5,11 @@
 
 import tensorflow as tf
 import pickle
-from AttentionUnit import AttentionWrapper
-from dualAttentionUnit import dualAttentionWrapper
-from LstmUnit import LstmUnit
-from fgateLstmUnit import fgateLstmUnit
-from OutputUnit import OutputUnit
+from .AttentionUnit import AttentionWrapper
+from .dualAttentionUnit import dualAttentionWrapper
+from .LstmUnit import LstmUnit
+from .fgateLstmUnit import fgateLstmUnit
+from .OutputUnit import OutputUnit
 
 
 class SeqUnit(object):
@@ -63,10 +63,10 @@ class SeqUnit(object):
         self.enc_mask = tf.sign(tf.to_float(self.encoder_pos))
         with tf.variable_scope(scope_name):
             if self.fgate_enc:
-                print 'field-gated encoder LSTM'
+                print('field-gated encoder LSTM')
                 self.enc_lstm = fgateLstmUnit(self.hidden_size, self.uni_size, self.field_encoder_size, 'encoder_select')
             else:
-                print 'normal encoder LSTM'
+                print('normal encoder LSTM')
                 self.enc_lstm = LstmUnit(self.hidden_size, self.uni_size, 'encoder_lstm')
             self.dec_lstm = LstmUnit(self.hidden_size, self.emb_size, 'decoder_lstm')
             self.dec_out = OutputUnit(self.hidden_size, self.target_vocab, 'decoder_output')
@@ -106,21 +106,21 @@ class SeqUnit(object):
 
         # ======================================== encoder ======================================== #
         if self.fgate_enc:
-            print 'field gated encoder used'
+            print('field gated encoder used')
             en_outputs, en_state = self.fgate_encoder(self.encoder_embed, self.field_pos_embed, self.encoder_len)
         else:
-            print 'normal encoder used'
+            print('normal encoder used')
             en_outputs, en_state = self.encoder(self.encoder_embed, self.encoder_len)
         # ======================================== decoder ======================================== #
 
         if self.dual_att:
-	        print 'dual attention mechanism used'
+	        print('dual attention mechanism used')
 	        with tf.variable_scope(scope_name):
 	            self.att_layer = dualAttentionWrapper(self.hidden_size, self.hidden_size, self.field_attention_size,
 	                                                    en_outputs, self.field_pos_embed, "attention")
 	            self.units.update({'attention': self.att_layer})
         else:
-            print "normal attention used"
+            print("normal attention used")
             with tf.variable_scope(scope_name):
                 self.att_layer = AttentionWrapper(self.hidden_size, self.hidden_size, en_outputs, "attention")
                 self.units.update({'attention': self.att_layer})
@@ -141,7 +141,7 @@ class SeqUnit(object):
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(self.mean_loss, tvars), self.grad_clip)
         optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-        self.train_op = optimizer.apply_gradients(zip(grads, tvars))
+        self.train_op = optimizer.apply_gradients(list(zip(grads, tvars)))
 
     def encoder(self, inputs, inputs_len):
         batch_size = tf.shape(self.encoder_input)[0]
@@ -289,11 +289,11 @@ class SeqUnit(object):
             
             inputs = [self.start_token]
             x_t = tf.nn.embedding_lookup(self.embedding, inputs)
-            print(x_t.get_shape().as_list())
+            print((x_t.get_shape().as_list()))
             o_t, s_nt = self.dec_lstm(x_t, initial_state)
             o_t, w_t = self.att_layer(o_t)
             o_t = self.dec_out(o_t)
-            print(s_nt[0].get_shape().as_list())
+            print((s_nt[0].get_shape().as_list()))
             # initial_state = tf.reshape(initial_state, [1,-1])
             logprobs2d = tf.nn.log_softmax(o_t)
             total_probs = logprobs2d + tf.reshape(beam_probs_0, [-1, 1])
@@ -302,7 +302,7 @@ class SeqUnit(object):
                                tf.slice(total_probs, [0, self.stop_token + 1],
                                         [1, self.target_vocab - self.stop_token - 1])], 1)
             flat_total_probs = tf.reshape(total_probs_noEOS, [-1])
-            print flat_total_probs.get_shape().as_list()
+            print(flat_total_probs.get_shape().as_list())
 
             beam_k = tf.minimum(tf.size(flat_total_probs), beam_size)
             next_beam_probs, top_indices = tf.nn.top_k(flat_total_probs, k=beam_k)
@@ -316,7 +316,7 @@ class SeqUnit(object):
             cand_seqs_pad = tf.pad(cand_seqs_0, [[0, 0], [0, 1]])
             beam_seqs_EOS = tf.pad(beam_seqs_0, [[0, 0], [0, 1]])
             new_cand_seqs = tf.concat([cand_seqs_pad, beam_seqs_EOS], 0)
-            print new_cand_seqs.get_shape().as_list()
+            print(new_cand_seqs.get_shape().as_list())
 
             EOS_probs = tf.slice(total_probs, [0, self.stop_token], [beam_size, 1])
             new_cand_probs = tf.concat([cand_probs_0, tf.reshape(EOS_probs, [-1])], 0)
@@ -329,7 +329,7 @@ class SeqUnit(object):
             part_state_0._shape = tf.TensorShape((None, None))
             part_state_1._shape = tf.TensorShape((None, None))
             next_states = (part_state_0, part_state_1)
-            print next_states[0].get_shape().as_list()
+            print(next_states[0].get_shape().as_list())
             return next_beam_seqs, next_beam_probs, next_cand_seqs, next_cand_probs, next_states, time_1
 
         beam_seqs_1, beam_probs_1, cand_seqs_1, cand_probs_1, states_1, time_1 = beam_init()
@@ -354,34 +354,34 @@ class SeqUnit(object):
             o_t, w_t = self.att_layer(o_t)
             o_t = self.dec_out(o_t)
             logprobs2d = tf.nn.log_softmax(o_t)
-            print logprobs2d.get_shape().as_list()
+            print(logprobs2d.get_shape().as_list())
             total_probs = logprobs2d + tf.reshape(beam_probs, [-1, 1])
-            print total_probs.get_shape().as_list()
+            print(total_probs.get_shape().as_list())
             total_probs_noEOS = tf.concat([tf.slice(total_probs, [0, 0], [beam_size, self.stop_token]),
                                            tf.tile([[-3e38]], [beam_size, 1]),
                                            tf.slice(total_probs, [0, self.stop_token + 1],
                                                     [beam_size, self.target_vocab - self.stop_token - 1])], 1)
-            print total_probs_noEOS.get_shape().as_list()
+            print(total_probs_noEOS.get_shape().as_list())
             flat_total_probs = tf.reshape(total_probs_noEOS, [-1])
-            print flat_total_probs.get_shape().as_list()
+            print(flat_total_probs.get_shape().as_list())
 
             beam_k = tf.minimum(tf.size(flat_total_probs), beam_size)
             next_beam_probs, top_indices = tf.nn.top_k(flat_total_probs, k=beam_k)
-            print next_beam_probs.get_shape().as_list()
+            print(next_beam_probs.get_shape().as_list())
 
             next_bases = tf.floordiv(top_indices, self.target_vocab)
             next_mods = tf.mod(top_indices, self.target_vocab)
-            print next_mods.get_shape().as_list()
+            print(next_mods.get_shape().as_list())
 
             next_beam_seqs = tf.concat([tf.gather(beam_seqs, next_bases),
                                         tf.reshape(next_mods, [-1, 1])], 1)
             next_states = (tf.gather(s_nt[0], next_bases), tf.gather(s_nt[1], next_bases))
-            print next_beam_seqs.get_shape().as_list()
+            print(next_beam_seqs.get_shape().as_list())
 
             cand_seqs_pad = tf.pad(cand_seqs, [[0, 0], [0, 1]])
             beam_seqs_EOS = tf.pad(beam_seqs, [[0, 0], [0, 1]])
             new_cand_seqs = tf.concat([cand_seqs_pad, beam_seqs_EOS], 0) 
-            print new_cand_seqs.get_shape().as_list()
+            print(new_cand_seqs.get_shape().as_list())
 
             EOS_probs = tf.slice(total_probs, [0, self.stop_token], [beam_size, 1])
             new_cand_probs = tf.concat([cand_probs, tf.reshape(EOS_probs, [-1])], 0)
