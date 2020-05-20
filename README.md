@@ -9,9 +9,9 @@ Details of table-to-text generation can be found [here](https://tyliupku.github.
 This a fork of the original package. The purpose is to configure it for the databricks+s3 environment. 
 ## ToDo
 1. [ ] Replace the ROUGE by pure python codes or simply remove it
-2. [ ] Make a setup.py file so that the package can be pip-installed
-3. [ ] Change the hard-coded paths to variables.
-4. [ ] Python 2 -> python 3
+2. [X] Make a setup.py file so that the package can be pip-installed
+3. [X] Change the hard-coded paths to variables.
+4. [X] Python 2 -> python 3
 
 # Model Overview
 <p align="center"><img width="85%" src="doc/frame.png"/></p>
